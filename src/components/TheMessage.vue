@@ -1,0 +1,46 @@
+<template>
+  <div>
+    <div class="message">
+      <p class="message-text" v-bind:class="messageClass"><slot></slot></p>
+      <!-- <p class="message-text"><slot></slot></p> -->
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    messageClass: {
+      type: String,
+      default: ''
+    }
+  },
+};
+</script>
+
+<style scoped>
+
+.sent {
+    background-color: rgb(0, 123, 255);
+    color: white;
+}
+
+
+.received {
+  background-color: white;
+  color: black;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.message-text {
+  /* background-color: #ffffff; */
+  border-radius: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  max-width: 200px;
+}
+</style>
