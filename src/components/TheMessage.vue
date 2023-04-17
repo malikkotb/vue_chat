@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="message">
-      <p class="message-text" v-bind:class="messageClass"><slot></slot></p>
+      <p class="message-text" v-bind:class="messageType"><slot></slot></p>
       <!-- <p class="message-text"><slot></slot></p> -->
     </div>
   </div>
@@ -10,7 +10,7 @@
 <script>
 export default {
   props: {
-    messageClass: {
+    messageType: {
       type: String,
       default: ''
     }

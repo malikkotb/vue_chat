@@ -8,6 +8,8 @@
         </span>
         <input type="text" class="form-control" placeholder="Search" aria-label="Input group example" aria-describedby="basic-addon1">
     </div>
+
+    <button class="btn btn-primary">Login</button>
   </div>
 </template>
 
