@@ -1,11 +1,14 @@
 <template>
   <div>
-    <div class="message-box">
-
-    <the-message v-for="msg in currentMessages" :key="msg.id" :message-type="msg.type">
+    <div v-if="error">Something went wrong</div>
+    <div v-else class="message-box">
+      <the-message
+        v-for="msg in currentMessages"
+        :key="msg.id"
+        :message-type="msg.type"
+      >
         <p>{{ msg.content }}</p>
-    </the-message>
-
+      </the-message>
     </div>
     <form id="message-form" @submit.prevent>
       <input
@@ -25,37 +28,47 @@ export default {
   components: { TheMessage },
   data() {
     return {
-      message: ''
-    }
-  }, 
+      message: "",
+      error: null,
+    };
+  },
   computed: {
     currentMessages() {
-      return this.$store.getters.currentMessages;
-    }
+      return this.$store.getters["messagesMod/currentMessages"];
+    },
+  },
+  created() {
+    this.loadMessages();
   },
   methods: {
-    sendMessage() { // this will add a 'sent' message
-      // dispatch the action: addMessageAction(payload is message) 
+    async loadMessages() {
+      try {
+        await this.$store.dispatch("messagesMod/loadMessages");
+      }
+      catch (error) {
+        this.error = error.message || "Something went wrong."
+      }
+    },
+    sendMessage() {
+      // this will add a 'sent' message
+      // dispatch the action: addMessageAction(payload is message)
       // which will commit the mutation to add a message to the store
       const messagePayload = {
-        id: 'm4',
-        author: 'Make this work with user who is logged in',
+        id: new Date().toISOString(),
+        author: "Make this work with user who is logged in",
         content: this.message.trim(),
-        type: 'sent'
-      }
+        // TODO: check here if currently logged in user
+        // is equal to author -> then type='sent'
+        // else: type = 'received'
+        // use ternary operator
+        type: "sent",
+      };
 
-      this.$store.dispatch('addMessageAction', messagePayload)
-      .then(() => {
-        console.log('User updated successfully');
-      })
-      .catch(error => {
-        console.log(error);
-      });
-
-      this.message = '';
-
-    }
-  }
+      this.$store.dispatch("messagesMod/addMessageAction", messagePayload);
+      this.message = "";
+      this.loadMessages();
+    },
+  },
 };
 </script>
 

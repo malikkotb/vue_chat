@@ -5,7 +5,7 @@
             <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
             <div class=""><input class="form-control" type="email" name="email" placeholder="Email"></div>
             <div class=""><input class="form-control" type="password" name="password" placeholder="Password"></div>
-            <div class="center-button"><button class="btn btn-primary">Log In</button></div>
+            <div class="center-button"><button @click="goToChat" class="btn btn-primary">Log In</button></div>
             <a href="#" class="forgot">No account? Register?</a>
             <!-- TODO: make this a router-link to a register page -->
             <a href="#" class="forgot">Forgot your email or password?</a>
@@ -16,9 +16,14 @@
 
 <script>
 export default {
-    // make this a page and load it with vuex router
-    // default page: / -> redirect to /login
-    // /chat == the actual chat app
+  methods: {
+    goToChat() {
+      //TODO: verify login details (with firebase)
+      // and authenticate the user to then go back
+      // use .replace -> so user cant just go back to login screen
+      this.$router.replace('/chat');
+    }
+  }
 }
 </script>
 

@@ -16,3 +16,22 @@
     </div>
   </div>
 </template>
+
+<script>
+import ChatHeader from "@/components/ChatHeader.vue";
+import ChatBox from "@/components/ChatBox.vue";
+import SideBar from "@/components/SideBar.vue";
+export default {
+  name: "App",
+  data() {
+    return {
+      loggedIn: false,
+    }
+  },
+  components: {
+    SideBar,
+    ChatHeader,
+    ChatBox,
+  },
+};
+</script>
