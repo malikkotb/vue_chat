@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="error">Something went wrong</div>
+    <div v-if="error">Something went wrong: {{ error.message }}</div>
     <div v-else class="message-box">
       <the-message
         v-for="msg in currentMessages"
@@ -49,7 +49,7 @@ export default {
         this.error = error.message || "Something went wrong."
       }
     },
-    sendMessage() {
+    async sendMessage() {
       // this will add a 'sent' message
       // dispatch the action: addMessageAction(payload is message)
       // which will commit the mutation to add a message to the store
@@ -64,7 +64,7 @@ export default {
         type: "sent",
       };
 
-      this.$store.dispatch("messagesMod/addMessageAction", messagePayload);
+      await this.$store.dispatch("messagesMod/addMessageAction", messagePayload);
       this.message = "";
       this.loadMessages();
     },

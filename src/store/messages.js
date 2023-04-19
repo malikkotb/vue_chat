@@ -18,13 +18,14 @@ export default {
 
     async loadMessages(context) {
         const userId = context.rootGetters.getUserId; 
+        // const userEmail = context.rootGetters.getUserMail;
         // TODO: load messages between 2 users
         // so somehow store messages of a conversation
         // instead of storing messages only for a single user
         // so they can actually communicate
 
         const token = context.rootGetters.getToken;
-        const response = await fetch(`https://chat-app-b3645-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/messages.json?auth=` + token);
+        const response = await fetch(`https://chat-app-b3645-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/messages.json?auth` + token); 
         const responseData = await response.json();
 
         if (!response.ok) { 
@@ -32,9 +33,8 @@ export default {
             throw error;
         }
         const messages = [];
-  
         for (const key in responseData) {
-            console.log(responseData[key].content);
+            // console.log(responseData[key].content);
             const message = {
                 id: responseData[key].id,
                 author: userId,
@@ -43,7 +43,8 @@ export default {
             }
             messages.push(message);
         }
-        
+        console.log('after loop');
+        console.log(messages);
         context.commit("setMessages", messages);
 
     },
@@ -64,9 +65,10 @@ export default {
         body: JSON.stringify(payload)
       });
 
-    //   const responseData = await response.json();
+      const responseData = await response.json();
       if (!response.ok) {
-        // error handling
+        const error = new Error(responseData.message || "Failed to fetch");
+        throw error;
       }
       context.commit("addMessage", {
         ...messageData,
