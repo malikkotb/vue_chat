@@ -43,8 +43,7 @@ export default {
             }
             messages.push(message);
         }
-        console.log('after loop');
-        console.log(messages);
+        console.log('after messages loop');
         context.commit("setMessages", messages);
 
     },

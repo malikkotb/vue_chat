@@ -7,6 +7,14 @@
         </div>
         <div class="">
           <input
+            v-if="mode === 'signup'"
+            class="form-control"
+            type="text"
+            id="username"
+            placeholder="Username"
+            v-model.trim="username"
+          />
+          <input
             class="form-control"
             type="email"
             id="email"
@@ -53,12 +61,19 @@
   </div>
 </template>
 
+
+// TODO: add Username input field to signup prompt and display that username in the
+
+
+
+
 <script>
 export default {
   data() {
     return {
       email: "",
       password: "",
+      username: "",
       formValid: true,
       mode: "login", // login or signup
       isloading: false,
@@ -81,7 +96,7 @@ export default {
       }
     },
     isLoggedInState() {
-      return this.$store.getters.isLoggedInGetter;
+      return this.$store.getters.isLoggedIn;
     }
   },
   methods: {

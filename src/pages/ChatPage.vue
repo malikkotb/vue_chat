@@ -33,10 +33,7 @@ export default {
     ChatHeader,
     ChatBox,
   },
-  mounted() {
-    // dispatch the action to get all currently logged in users
-    this.$store.dispatch("getUsersAction");
-  }
+
 };
 </script>
 

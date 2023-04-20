@@ -12,10 +12,31 @@
 export default {
   name: "App",
   data() {
-    return {
-    }
+    return {};
+  },
+  computed: {
+    loginStatus() {
+      return this.$store.getters.isLoggedIn;
+    },
   },
 
+  mounted() {
+    window.addEventListener("beforeunload", this.confirmReload);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("beforeunload", this.confirmReload);
+  },
+
+  methods: {
+    confirmReload(event) {
+      event.preventDefault();
+      event.returnValue = "";
+      if (window.confirm("Are you sure you want to reload the page?")) {
+        location.reload();
+      }
+    },
+  },
 };
 </script>
 
@@ -47,5 +68,4 @@ export default {
   opacity: 1;
   transform: translateY(0);
 }
-
 </style>

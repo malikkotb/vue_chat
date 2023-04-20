@@ -1,12 +1,11 @@
 import { createStore } from "vuex";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-
+// import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getDatabase, ref, onValue, set } from "firebase/database";
 
 import messagesModule from "./messages.js";
 
 const store = createStore({
   modules: {
-    // users: usersModule,
     messagesMod: messagesModule,
   },
   state() {
@@ -33,8 +32,7 @@ const store = createStore({
       state.isLoggedIn = true;
     },
     setUserList(state, payload) {
-      console.log("log from mutation to set currentUserList");
-      console.log("User-List: " + payload);
+      console.log("currentUsers: " + payload);
       state.currentUsers = payload;
     },
   },
@@ -69,7 +67,18 @@ const store = createStore({
         userId: responseData.localId,
         tokenExpiration: responseData.expiresIn,
       });
+
+
+      // TODO: add firebase UID of newly registered user to extra Reiter in Realtime Database
+      // to then display all users 
+      const db = getDatabase();
+      set(ref(db, 'userIds/' + responseData.localId), {
+        email: payload.email,
+        userId: responseData.localId, // store the userId in the realtime db
+      });
+
     },
+  
     async login(context, payload) {
       // only thing thats different is url compared to singup method
       const response = await fetch(
@@ -105,39 +114,33 @@ const store = createStore({
       context.commit("setLoggedIn");
     },
 
-    async getUsersAction(context, payload) {
-      // await fetch();
+    async getUsersAction(context) {
+      ///////////////
+      // THIS ACTION IS DISPATCHED IN MOUNTED() of ChatBox.vue
 
+      // Hier: beim regrisitreiren der nutzer einfach
+      // separat die nutzer in der Realtime Database speichern und diese mit getDatabase() -> mit einem snapshot holen
       const userList = [];
 
-      const auth = getAuth();
-      await onAuthStateChanged(auth, user => {
-        // Check for user status
-        if (user) {
-          console.log("User is logged in: "+ user);
-          this.userList.push(user);
-        } else {
-          // user not logged in i guess
-          console.log("user not logged in - from inside onAuthStateChanged");
+      const db = getDatabase(); // realtime db from firebase
+      const userListRef = ref(db, "userIds/");
+      onValue(userListRef, (snapshot) => {
+        const data = snapshot.val();
+        console.log(data);
+
+       
+        for (let key in data) {
+          console.log(data[key]);
         }
+
+        // userList.push({object with uid, username and email})
+
+        // TODO: use this data to display the list of users to access individual chats
+        // between 2 users
+
       });
 
-      // Listen for changes to the authentication state
-      // await auth.onAuthStateChanged((user) => {
-      //   if (user) {
-      //     // If the user is signed in, add their information to the list of signed-in users
-      //     this.userList.push({
-      //       uid: user.uid,
-      //       displayName: user.displayName,
-      //       email: user.email,
-      //     });
-      //   } else {
-      //     // If the user is signed out, remove their information from the list of signed-in users
-      //     this.users = this.users.filter((u) => u.uid !== user.uid);
-      //   }
-      // });
 
-      console.log("unnecessary log of payload: " + payload);
       context.commit("setUserList", userList);
     },
   },
@@ -152,7 +155,7 @@ const store = createStore({
     getToken(state) {
       return state.token;
     },
-    isLoggedInGetter(state) {
+    isLoggedIn(state) {
       return state.isLoggedIn;
     },
     getReceiverId(state) {

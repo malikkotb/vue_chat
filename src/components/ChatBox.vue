@@ -40,13 +40,15 @@ export default {
   created() {
     this.loadMessages();
   },
+  mounted() {
+    this.$store.dispatch("getUsersAction");
+  },
   methods: {
     async loadMessages() {
       try {
         await this.$store.dispatch("messagesMod/loadMessages");
-      }
-      catch (error) {
-        this.error = error.message || "Something went wrong."
+      } catch (error) {
+        this.error = error.message || "Something went wrong.";
       }
     },
     async sendMessage() {
@@ -64,7 +66,10 @@ export default {
         type: "sent",
       };
 
-      await this.$store.dispatch("messagesMod/addMessageAction", messagePayload);
+      await this.$store.dispatch(
+        "messagesMod/addMessageAction",
+        messagePayload
+      );
       this.message = "";
       this.loadMessages();
     },
