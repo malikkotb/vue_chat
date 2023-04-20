@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 // import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import { getDatabase, ref, get, set } from "firebase/database";
 
 import messagesModule from "./messages.js";
 
@@ -12,7 +12,8 @@ const store = createStore({
     return {
       // userId corresponds to currently logged in user
       userId: null,
-      receiverId: null,
+      // receiverId: 'D0GWrwmZGnPAQm2HRLFZf1LPRvH3',
+      receiverId: null, // is set by clicking on recipient in SideBar
       currentUsers: [],
       token: null,
       userEmail: "",
@@ -32,11 +33,17 @@ const store = createStore({
       state.isLoggedIn = true;
     },
     setUserList(state, payload) {
-      console.log("currentUsers: " + payload);
+      console.log("payload: inside setUserList: " + payload);
       state.currentUsers = payload;
+    },
+    setReceiverId(state, payload) {
+      state.receiverId = payload;
     },
   },
   actions: {
+    setReceiverIdAction(context, payload) {
+      context.commit("setReceiverId", payload);
+    },
     async signup(context, payload) {
       // this sends the request which creates a new user
       const response = await fetch(
@@ -44,6 +51,7 @@ const store = createStore({
         {
           method: "POST",
           body: JSON.stringify({
+            username: payload.username,
             email: payload.email,
             password: payload.password,
             returnSecureToken: true,
@@ -68,17 +76,17 @@ const store = createStore({
         tokenExpiration: responseData.expiresIn,
       });
 
-
-      // TODO: add firebase UID of newly registered user to extra Reiter in Realtime Database
-      // to then display all users 
+      // add firebase UID of newly registered user to extra Reiter in Realtime Database
+      // to then display all users
       const db = getDatabase();
-      set(ref(db, 'userIds/' + responseData.localId), {
+      // set(ref(db, 'userIds/' + payload.username), {
+      set(ref(db, "userIds/" + responseData.localId), {
+        username: payload.username,
         email: payload.email,
         userId: responseData.localId, // store the userId in the realtime db
       });
-
     },
-  
+
     async login(context, payload) {
       // only thing thats different is url compared to singup method
       const response = await fetch(
@@ -115,33 +123,27 @@ const store = createStore({
     },
 
     async getUsersAction(context) {
-      ///////////////
-      // THIS ACTION IS DISPATCHED IN MOUNTED() of ChatBox.vue
-
-      // Hier: beim regrisitreiren der nutzer einfach
-      // separat die nutzer in der Realtime Database speichern und diese mit getDatabase() -> mit einem snapshot holen
       const userList = [];
 
       const db = getDatabase(); // realtime db from firebase
       const userListRef = ref(db, "userIds/");
-      onValue(userListRef, (snapshot) => {
-        const data = snapshot.val();
-        console.log(data);
 
-       
-        for (let key in data) {
-          console.log(data[key]);
-        }
+      const snapshot = await get(userListRef);
 
-        // userList.push({object with uid, username and email})
+      const data = snapshot.val();
 
-        // TODO: use this data to display the list of users to access individual chats
-        // between 2 users
+      for (let key in data) {
+        const user = {
+          userId: data[key].userId,
+          username: data[key].username, // don't need email here
+        };
+        userList.push(user);
+      }
 
-      });
-
-
+      console.log("userList inside action: ", userList);
       context.commit("setUserList", userList);
+      // TODO: use this data to display the list of users to access individual chats
+      // between 2 users
     },
   },
 

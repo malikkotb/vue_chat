@@ -9,7 +9,6 @@
         <input type="text" class="form-control" placeholder="Search" aria-label="Input group example" aria-describedby="basic-addon1">
     </div> -->
 
-    <!-- sidebar-->
     <div
       class="d-flex flex-column flex-shrink-0 p-3 bg-light"
       style="width: 100%"
@@ -18,9 +17,14 @@
       <hr />
       <div class="userList">
         <ul class="nav flex-column mb-auto">
-          <li class="nav-item" v-for="dummy in dummyUsers" :key="dummy">
-            <button>
-              {{ dummy }}
+          <li class="nav-item" v-for="user in listOfUsers" :key="user.userId">
+            <button
+              @click="setReceiverId(user.userId)"
+              :class="activeButton(user.userId)"
+            >
+              <!-- :style="{ backgroundColor: activeButton(user.userId) }" -->
+              <!-- :class="{ backgroundColor: user.userId === activeButtonID }" -->
+              {{ user.username }}
             </button>
           </li>
         </ul>
@@ -41,7 +45,7 @@
             height="32"
             class="rounded-circle me-2"
           />
-          <strong>mdo</strong>
+          <strong>{{ loggedInUser }}</strong>
         </a>
         <ul
           class="dropdown-menu text-small shadow"
@@ -62,35 +66,58 @@
 export default {
   data() {
     return {
-      active: null,
-      dummyUsers: [
-        "Mandem",
-        "Mischa",
-        "Noah",
-        "Dato",
-        "Ben",
-        "Mandem",
-        "Mischa",
-        "Noah",
-        "Dato",
-        "Ben",
-      ],
+      activeButtonID: null,
     };
   },
   computed: {
     listOfUsers() {
-      return this.$store.getters.getCurrentUsers();
-    }
+      const currentUsers = this.$store.getters.getCurrentUsers;
+      const loggedInUserID = this.$store.getters.getUserId;
+      const usersWithoutLoggedInUser = currentUsers.filter(
+        (user) => user.userId !== loggedInUserID
+      );
+      return usersWithoutLoggedInUser;
+    },
+    loggedInUser() {
+      const loggedInUserID = this.$store.getters.getUserId;
+      const currentUsers = this.$store.getters.getCurrentUsers;
+      const activeUser = currentUsers.filter(
+        (user) => user.userId === loggedInUserID
+      )[0];
+      // return activeUser.username;
+      if (activeUser) {
+        return activeUser.username;
+      } else {
+        return "loading..."; // or some other default value
+      }
+    },
+    activeButton() {
+      return (userId) => {
+        if (userId === this.activeButtonID) {
+          return "active-button";
+        } else {
+          return "inactive-button";
+        }
+      };
+    },
   },
   methods: {
+    //TODO: display last sent message beneath username
+    // on sidebar
 
+    setActiveButton(userId) {
+      this.activeButtonID = userId;
+    },
+    setReceiverId(receiverId) {
+      // set the receiver id on click of chat on sidebar
+      this.activeButtonID = receiverId;
+      console.log("activeButtonId: " + this.activeButtonID);
+      console.log("receiverId" + receiverId);
+      this.$store.dispatch("setReceiverIdAction", receiverId);
+    },
     searchFunction() {
-    // TODO: use v-model to bind the input box and make the searchbar search instantaeneausly
-    }
-    ,stayActive() {
-      // when button is clicked, so when its active
-      // it should stay active until a different button is clicked
-    }
+      // TODO: use v-model to bind the input box and make the searchbar search instantaeneausly
+    },
   },
 };
 </script>
@@ -114,18 +141,19 @@ export default {
   padding: 8px 12px;
   /* border-radius: 5px; */
   border: none;
-  background-color: white;
-  color: black;
+ 
   cursor: pointer;
   width: 100%;
 }
 
-.userList ul li button:focus,
-.userList ul li button:active {
-  background-color: #007AFE !important;
+.active-button {
+  background-color: #007afe;
   color: white;
   outline: none;
 }
-
+.inactive-button {
+   background-color: white; 
+   color: black;
+}
 
 </style>

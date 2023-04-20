@@ -61,11 +61,8 @@
   </div>
 </template>
 
-
-// TODO: add Username input field to signup prompt and display that username in the
-
-
-
+// TODO: add Username input field to signup prompt and display that username in
+the
 
 <script>
 export default {
@@ -97,7 +94,7 @@ export default {
     },
     isLoggedInState() {
       return this.$store.getters.isLoggedIn;
-    }
+    },
   },
   methods: {
     async submitDetails() {
@@ -119,31 +116,52 @@ export default {
           // dispatch login action
           await this.$store.dispatch("login", {
             email: this.email,
-            password: this.password
-          }) 
-
+            password: this.password,
+          });
         } else {
-          //disaptch signup action
+          //dispatch signup action
           await this.$store.dispatch("signup", {
+            username: this.username,
             email: this.email,
             password: this.password,
           });
-          this.mode = 'login';
+          this.mode = "login";
         }
       } catch (err) {
         this.error = err.message || "Failed to authenticate user, try again";
       }
 
-      this.isloading = false;
+      this.$store.dispatch("getUsersAction");
 
-      if (this.isLoggedInState) {
-        // use .replace -> so user cant just go back to login screen
-        this.$router.replace('/chat');
-      } else {
-        this.email = '';
-        this.password = '';
+      while (
+        this.$store.gettersgetUserId === null ||
+        this.$store.getters.getCurrentUsers === null
+      ) {
+        console.log("still null");
+        this.isloading = true;
       }
-    
+
+      this.isloading = false;
+      if (this.isLoggedInState) {
+        console.log("logged in");
+        // use .replace -> so user cant just go back to login screen
+        this.$router.replace("/chat");
+      } else {
+        this.username = "";
+        this.email = "";
+        this.password = "";
+      }
+
+      // this.isloading = false;
+
+      // if (this.isLoggedInState) {
+      //   // use .replace -> so user cant just go back to login screen
+      //   this.$router.replace('/chat');
+      // } else {
+      //   this.username = '';
+      //   this.email = '';
+      //   this.password = '';
+      // }
     },
     switchAuthMode() {
       if (this.mode === "login") {
@@ -155,10 +173,10 @@ export default {
 
     dismissDialog() {
       this.error = null;
-      this.email = '';
-      this.password = '';
-    }
-
+      this.username = "";
+      this.email = "";
+      this.password = "";
+    },
   },
 };
 </script>

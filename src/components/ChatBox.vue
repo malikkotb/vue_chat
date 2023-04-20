@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="error">Something went wrong: {{ error.message }}</div>
+    <div v-if="error">Something went wrong:{{ error }}</div>
     <div v-else class="message-box">
       <the-message
         v-for="msg in currentMessages"
@@ -30,24 +30,41 @@ export default {
     return {
       message: "",
       error: null,
+      
     };
   },
   computed: {
     currentMessages() {
       return this.$store.getters["messagesMod/currentMessages"];
     },
+    receiverIdValue() {
+      return this.$store.getters.getReceiverId;
+    }
   },
-  created() {
-    this.loadMessages();
+  watch: {
+    receiverIdValue(newVal) {
+      if (newVal !== null) {
+        this.loadMessagesWhenReceiverIdNotNull();
+      }
+    }
   },
   mounted() {
-    this.$store.dispatch("getUsersAction");
+    if (this.$store.getters.getReceiverId === null) {
+      console.log("\n\n\n\n receiver id is thill null \n\n\n\n");
+    }
+    // this.loadMessages();
   },
   methods: {
+    loadMessagesWhenReceiverIdNotNull() {
+      this.loadMessages();
+    },
     async loadMessages() {
+      //TODO: load messages between the userId and the receiverId
+
       try {
         await this.$store.dispatch("messagesMod/loadMessages");
       } catch (error) {
+        console.log("inside loadMessages");
         this.error = error.message || "Something went wrong.";
       }
     },
@@ -57,12 +74,12 @@ export default {
       // which will commit the mutation to add a message to the store
       const messagePayload = {
         id: new Date().toISOString(),
-        author: "Make this work with user who is logged in",
+        // author: "Make this work with user who is logged in",
         content: this.message.trim(),
         // TODO: check here if currently logged in user
         // is equal to author -> then type='sent'
-        // else: type = 'received'
-        // use ternary operator
+        // else: type = 'received'        
+
         type: "sent",
       };
 
