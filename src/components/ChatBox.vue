@@ -30,7 +30,7 @@ export default {
     return {
       message: "",
       error: null,
-      
+      intervalId: null,
     };
   },
   computed: {
@@ -48,19 +48,24 @@ export default {
       }
     }
   },
-  mounted() {
-    if (this.$store.getters.getReceiverId === null) {
-      console.log("\n\n\n\n receiver id is thill null \n\n\n\n");
-    }
-    // this.loadMessages();
+  beforeUnmount() {
+    clearInterval(this.intervalId); // clear the interval when the component is destroyed
   },
+  // mounted() {
+  //   if (this.$store.getters.getReceiverId === null) {
+  //     console.log("\n\n\n\n receiver id is thill null \n\n\n\n");
+  //   } else { // if receiverId is not null call loadeMessages almost constantly
+  //     this.intervalId = setInterval(this.loadMessages, 1000); // call myMethod every second
+  //   }
+  // },
   methods: {
     loadMessagesWhenReceiverIdNotNull() {
-      this.loadMessages();
+      console.log("right now, as you can see messages are only being refreshed once the receiverId has a new value");
+      if (this.$store.getters.getReceiverId !== null) {
+        this.intervalId = setInterval(this.loadMessages, 1000); // call myMethod every second
+      }
     },
     async loadMessages() {
-      //TODO: load messages between the userId and the receiverId
-
       try {
         await this.$store.dispatch("messagesMod/loadMessages");
       } catch (error) {

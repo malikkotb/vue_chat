@@ -17,6 +17,7 @@ const store = createStore({
       currentUsers: [],
       token: null,
       userEmail: "",
+      userUsername: "",
       tokenExpiration: null,
       isLoggedIn: false,
     };
@@ -27,6 +28,7 @@ const store = createStore({
       state.userId = payload.userId;
       state.tokenExpiration = payload.tokenExpiration;
       state.userEmail = payload.email;
+      state.userUsername = payload.userUsername;
     },
     setLoggedIn(state) {
       // set isLoggedIn to true
@@ -74,6 +76,7 @@ const store = createStore({
         token: responseData.idToken,
         userId: responseData.localId,
         tokenExpiration: responseData.expiresIn,
+        userUsername: payload.username,
       });
 
       // add firebase UID of newly registered user to extra Reiter in Realtime Database
@@ -166,6 +169,9 @@ const store = createStore({
     getCurrentUsers(state) {
       return state.currentUsers;
     },
+    getUserUsername(state) {
+      return state.userUsername;
+    }
   },
 });
 

@@ -1,4 +1,4 @@
-import { getDatabase, ref, get, set, child } from "firebase/database";
+import { getDatabase, ref, get, update, child } from "firebase/database";
 
 export default {
   namespaced: true,
@@ -30,63 +30,31 @@ export default {
         console.log("AHHH NO RECIEVER ID");
       }
 
-      const receiverUsername = currentUsers.find(
-        (user) => user.userId === receiverId
-      ).username;
-      console.log("RECEIVER USERNAME: " + receiverUsername);
-
-      ///////////////////
-
-
-      // TODO: get type: here from database and set it here somehow
-      // because it always depends on who is reading the data
-
-      const dbRef = ref(getDatabase());
-      //       set(ref(db, "users/messages/" + userId), {
-      get(child(dbRef, `users/messages/${userId}`))
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            console.log("SNAPSHOT: " + data);
-            const keys = Object.keys(data);
-            const values = Object.values(data);
-            console.log("Keys: " + keys + "\n\nValues: " + values);
-          } else {
-            console.log("No data available");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-
-        ////////////////
-
-      const token = context.rootGetters.getToken;
-      const response = await fetch(
-        `https://chat-app-b3645-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/messages/chatWith:${receiverUsername}.json?auth=` +
-          token
-      );
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        const error = new Error(responseData.message || "Failed to fetch");
-        throw error;
-      }
-
       const messages = [];
-      for (const key in responseData) {
-        console.log(responseData[key].content);
-        const message = {
-          id: responseData[key].id,
-          content: responseData[key].content,
-      // TODO: get type: here from database and set it here somehow
-      // because it always depends on who is reading the data
-          type: responseData[key].type,
-          // TODO: hier abgleichen ob 
-        };
-        messages.push(message);
+      const dbRef = await ref(getDatabase());
+      try {
+        const snapshot = await get(child(dbRef, `users/messages/${userId}`));
+        if (snapshot.exists()) {
+          const responseData = snapshot.val();
+          for (const key in responseData) {
+            if (responseData[key].receiver_id === receiverId || responseData[key].sender_id === receiverId) {
+              const message = {
+                id: responseData[key].message_id,
+                content: responseData[key].content,
+                type: responseData[key].type,
+              };
+              messages.push(message);
+            }
+          }
+        } else {
+          console.log("No data available");
+        }
+      } catch (error) {
+        console.error(error);
       }
-      console.log("after messages loop");
+
+      // console.log("Messages:");
+      // messages.forEach((item) => console.log(item));
       context.commit("setMessages", messages);
     },
 
@@ -105,52 +73,54 @@ export default {
       const receiverUsername = currentUsers.find(
         (user) => user.userId === receiverId
       ).username;
-      console.log("RECEIVER USERNAME" + receiverUsername);
+      const currentUser_username = currentUsers.find(
+        (user) => user.userId === userId
+      ).username;
 
-      // payload = the message
-      // const token = context.rootGetters.getToken;
-      // const response = await fetch(
-      //   `https://chat-app-b3645-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/messages/chatWith:${receiverUsername}.json?auth=` +
-      //     token,
-      //   {
-      //     method: "POST",
-      //     body: JSON.stringify(payload),
-      //   }
-      // );
-
-      // const responseData = await response.json();
-      // if (!response.ok) {
-      //   const error = new Error(responseData.message || "Failed to fetch");
-      //   throw error;
-      // }
+      let date = new Date(payload.id);
+      const options = { timeZone: "Europe/Berlin" };
+      let formattedDate = date.toLocaleString("de-DE", options);
+      formattedDate = formattedDate.replace("AM", "");
+      formattedDate = formattedDate.replaceAll(".", "-");
+      // console.log(formattedDate); // "4/21/2023, 9:32:32 "
+      formattedDate = formattedDate.replaceAll("/", "-");
+      formattedDate = formattedDate.replaceAll(",", "|");
+      const message_id_unique = formattedDate.replace(/\s/g, "");
 
       const db = getDatabase();
       // sender message Write to DB
-      set(ref(db, "users/messages/" + userId), {
-        username: receiverUsername,
-        message_id: payload.id,
+      update(ref(db, "users/messages/" + userId + "/" + message_id_unique), {
+        username_chatWith: receiverUsername,
+        message_id: message_id_unique,
         content: payload.content,
         type: "sent",
-        sender_id: userId
+        sender_id: userId,
+        receiver_id: receiverId,
       });
 
       // receiver message Write to DB
-      set(ref(db, "users/messages/" + receiverId), {
-        username: receiverUsername,
-        message_id: payload.id,
-        content: payload.content,
-        type: 'received',
-        sender_id: userId, // sender_id in this case is the userId and not the receiverId, as the user is the sender of the message
-      });
-
-
-
-      // write same data to path of recipient user
+      update(
+        ref(db, "users/messages/" + receiverId + "/" + message_id_unique),
+        {
+          username_chatWith: currentUser_username, // userID-userName of sender
+          message_id: message_id_unique,
+          content: payload.content,
+          type: "received",
+          sender_id: userId, // sender_id in this case is the userId and not the receiverId, as the user is the sender of the message
+          receiver_id: receiverId,
+        }
+      );
 
       context.commit("addMessage", {
         ...messageData,
         id: userId,
       });
+
+      // call loadMessages 
+      //now calling loadmessages as soon as there is a new message
+      context.dispatch("loadMessages");
+
+
     },
   },
 
