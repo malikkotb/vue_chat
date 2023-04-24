@@ -151,17 +151,6 @@ export default {
         this.email = "";
         this.password = "";
       }
-
-      // this.isloading = false;
-
-      // if (this.isLoggedInState) {
-      //   // use .replace -> so user cant just go back to login screen
-      //   this.$router.replace('/chat');
-      // } else {
-      //   this.username = '';
-      //   this.email = '';
-      //   this.password = '';
-      // }
     },
     switchAuthMode() {
       if (this.mode === "login") {

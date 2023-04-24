@@ -41,6 +41,15 @@ const store = createStore({
     setReceiverId(state, payload) {
       state.receiverId = payload;
     },
+    logout(state) {
+      state.token = null;
+      state.userId = null;
+      state.tokenExpiration = null;
+      state.userEmail = "";
+      state.currentUsers = [];
+      state.userUsername = "";
+      state.isLoggedIn = false;
+    }
   },
   actions: {
     setReceiverIdAction(context, payload) {
@@ -148,6 +157,9 @@ const store = createStore({
       // TODO: use this data to display the list of users to access individual chats
       // between 2 users
     },
+    logout(context) {
+      context.commit("logout");
+    }
   },
 
   getters: {

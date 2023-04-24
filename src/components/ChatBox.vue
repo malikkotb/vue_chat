@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="error">Something went wrong:{{ error }}</div>
-    <div v-else class="message-box">
+    <div v-else class="messageBox" id="list-div">
       <the-message
         v-for="msg in currentMessages"
         :key="msg.id"
@@ -39,14 +39,14 @@ export default {
     },
     receiverIdValue() {
       return this.$store.getters.getReceiverId;
-    }
+    },
   },
   watch: {
     receiverIdValue(newVal) {
       if (newVal !== null) {
         this.loadMessagesWhenReceiverIdNotNull();
       }
-    }
+    },
   },
   beforeUnmount() {
     clearInterval(this.intervalId); // clear the interval when the component is destroyed
@@ -60,7 +60,9 @@ export default {
   // },
   methods: {
     loadMessagesWhenReceiverIdNotNull() {
-      console.log("right now, as you can see messages are only being refreshed once the receiverId has a new value");
+      console.log(
+        "right now, as you can see messages are only being refreshed once the receiverId has a new value"
+      );
       if (this.$store.getters.getReceiverId !== null) {
         this.intervalId = setInterval(this.loadMessages, 1000); // call myMethod every second
       }
@@ -68,6 +70,7 @@ export default {
     async loadMessages() {
       try {
         await this.$store.dispatch("messagesMod/loadMessages");
+        this.scrollToBottom();
       } catch (error) {
         console.log("inside loadMessages");
         this.error = error.message || "Something went wrong.";
@@ -81,10 +84,6 @@ export default {
         id: new Date().toISOString(),
         // author: "Make this work with user who is logged in",
         content: this.message.trim(),
-        // TODO: check here if currently logged in user
-        // is equal to author -> then type='sent'
-        // else: type = 'received'        
-
         type: "sent",
       };
 
@@ -95,12 +94,18 @@ export default {
       this.message = "";
       this.loadMessages();
     },
+    scrollToBottom() {
+      const el = document.getElementById("list-div");
+      if (el) {
+        el.scrollTop = el.scrollHeight;
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-.message-box {
+.messageBox {
   background-color: #f5f5f5;
   border-radius: 10px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
@@ -109,6 +114,7 @@ export default {
   height: 400px;
   overflow-y: scroll;
   position: relative;
+  scroll-behavior: smooth;
 }
 
 #message-form {
