@@ -8,52 +8,25 @@
         <input type="text" class="form-control" placeholder="Search..." />
       </div>
       <ul class="list-unstyled chat-list mt-2 mb-0">
-         
-        <a role="button" @click="setReceiverId(user.userId)"
-        v-for="user in listOfUsers" :key="user.userId"
-        ><li class="clearfix"
-        :class="activeButton(user.userId)">
-          <img
-          src="https://www.thestreet.com/.image/ar_1:1%2Cc_fill%2Ccs_srgb%2Cfl_progressive%2Cq_auto:good%2Cw_1200/MTg5OTE4ODcwNTYyMTU0MjM4/lebron-james3.jpg"
+        <a
+          role="button"
+          @click="setReceiverId(user.userId)"
+          v-for="(user,index) in listOfUsers"
+          :key="user.userId"
+          ><li class="clearfix" :class="activeButton(user.userId)">
+            <!-- <img :src="pic" alt="avatar" /> -->
+            <img
+            :src="profile(index)"
             alt="avatar"
           />
-          <div class="about">
-            <div class="name">{{ user.username }}</div>
-            <div class="status"><i class="fa fa-circle online"></i> online</div>
-          </div>
-        </li></a>
-        <li class="clearfix">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar3.png"
-            alt="avatar"
-          />
-          <div class="about">
-            <div class="name">Mike Thomas</div>
-            <div class="status"><i class="fa fa-circle online"></i> online</div>
-          </div>
-        </li>
-        <li class="clearfix">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar7.png"
-            alt="avatar"
-          />
-          <div class="about">
-            <div class="name">Christian Kelly</div>
-            <div class="status">
-              <i class="fa fa-circle offline"></i> left 10 hours ago
+            <div class="about">
+              <div class="name">{{ user.username }}</div>
+              <div class="status">
+                <i class="fa fa-circle online"></i> online
+              </div>
             </div>
-          </div>
-        </li>
-        <li class="clearfix">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar8.png"
-            alt="avatar"
-          />
-          <div class="about">
-            <div class="name">Monica Ward</div>
-            <div class="status"><i class="fa fa-circle online"></i> online</div>
-          </div>
-        </li>
+          </li></a
+        >
       </ul>
     </div>
   </div>
@@ -63,7 +36,9 @@
 export default {
   data() {
     return {
+      counter: 0,
       activeButtonID: null,
+      profilePics: [],
     };
   },
   computed: {
@@ -93,18 +68,17 @@ export default {
         if (userId === this.activeButtonID) {
           return "active";
         }
-        //  else {
-        //   return "inactive-button";
-        // }
       };
     },
   },
+
   methods: {
-    handleClick() {
-        console.log("button clicked");
-    },
     setActiveButton(userId) {
       this.activeButtonID = userId;
+    },
+    profile(index) {
+        return `https://bootdey.com/img/Content/avatar/avatar${index+1}.png`;
+        // return `https://bootdey.com/img/Content/avatar/avatar1.png`;
     },
     setReceiverId(receiverId) {
       // set the receiver id on click of chat on sidebar
@@ -120,7 +94,25 @@ export default {
       this.$store.dispatch("logout");
       this.$router.replace("/login");
     },
-    
+
+    // async getProfilePic() {
+    //   const keyword = "nature";
+    //   const apiKey = "4YvuMDn8NnQ0n73D0jPOGVfeoHnCHwO5iOFUyTyU45nfyt3MIjEHOiNo";
+    //   const url = `https://api.pexels.com/v1/search?query=${keyword}&per_page=10&page=1`;
+    //   await fetch(url, {
+    //     headers: {
+    //       Authorization: apiKey,
+    //     },
+    //   })
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //       console.log("data.photos: " + data.photos.length);
+    //       this.profilePics = data.photos;
+    //     })
+    //     .catch((error) => {
+    //       console.error(error);
+    //     });
+    // },
   },
 };
 </script>
@@ -161,7 +153,6 @@ body {
   transition: 0.5s;
 }
 
-
 /** new styling for button */
 /* .people-list .chat-list button {
   background-color: transparent;
@@ -188,10 +179,6 @@ body {
 } */
 /** */
 
-
-
-
-
 .people-list .chat-list li {
   padding: 10px 15px;
   list-style: none;
@@ -213,6 +200,7 @@ body {
 
 .people-list .chat-list img {
   width: 45px;
+  height: 45px;
   border-radius: 50%;
 }
 

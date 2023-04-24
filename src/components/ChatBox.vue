@@ -6,6 +6,7 @@
         v-for="msg in currentMessages"
         :key="msg.id"
         :message-type="msg.type"
+        :class="typeOfMessage(msg.type)"
       >
         <p>{{ msg.content }}</p>
       </the-message>
@@ -100,6 +101,13 @@ export default {
         el.scrollTop = el.scrollHeight;
       }
     },
+    typeOfMessage(messageType) {
+      if (messageType === 'sent') {
+        return 'float: right';
+      } else {
+        return 'float: left';
+      }
+    }
   },
 };
 </script>

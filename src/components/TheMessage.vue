@@ -1,8 +1,7 @@
 <template>
-  <div>
-    <div class="message">
+  <div class="outer">
+    <div class="message" :style="{ justifyContent: messageType === 'received' ? 'flex-end' : 'felx-start' }" >
       <p class="message-text" v-bind:class="messageType"><slot></slot></p>
-      <!-- <p class="message-text"><slot></slot></p> -->
     </div>
   </div>
 </template>
@@ -12,28 +11,33 @@ export default {
   props: {
     messageType: {
       type: String,
-      default: ''
-    }
+      default: "",
+    },
   },
 };
 </script>
 
 <style scoped>
 
-.sent {
-    background-color: rgb(0, 123, 255);
-    color: white;
+.outer {
+  display: flex;
+  flex-direction: column;
 }
-
+.sent {
+  background-color: rgb(0, 123, 255);
+  color: white;
+}
 
 .received {
   background-color: white;
   color: black;
+
 }
 
 .message {
   display: flex;
   margin-bottom: 10px;
+  /* justify-content: flex-end; */
 }
 
 .message-text {
