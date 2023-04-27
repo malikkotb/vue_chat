@@ -11,6 +11,8 @@
         <p>{{ msg.content }}</p>
       </the-message>
     </div>
+    
+    <!-- message-form -->
     <form id="message-form" @submit.prevent>
       <input
         type="text"

@@ -1,121 +1,34 @@
 <template>
-  <div class="chat-app">
-    <div id="plist" class="people-list">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">
-            <i class="fa fa-search"></i>
-          </span>
-        </div>
-        <input type="text" class="form-control" placeholder="Search..." />
-      </div>
-      <ul class="list-unstyled chat-list mt-2 mb-0">
-        <a
-          role="button"
-          @click="setReceiverId(user.userId)"
-          v-for="(user,index) in listOfUsers"
-          :key="user.userId"
-          ><li class="clearfix" :class="activeButton(user.userId)">
-            <!-- <img :src="pic" alt="avatar" /> -->
-            <img
-            :src="profile(index)"
-            alt="avatar"
-          />
-            <div class="about">
-              <div class="name">{{ user.username }}</div>
-              <div class="status">
-                <i class="fa fa-circle online"></i> online
-              </div>
+  <div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card chat-app">
+            <side-bar></side-bar>
+
+            <!-- chatArea -->
+            <div class="chat">
+                <!-- TODO: change names of components back -->
+              <new-chat-header></new-chat-header>
+              <new-chat-box></new-chat-box>
+
             </div>
-          </li></a
-        >
-      </ul>
+            <!-- end of chatArea -->
+
+
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
-
 <script>
+import SideBar from "../components/SideBar.vue";
+import NewChatHeader from "../components/NewChatHeader.vue";
+import NewChatBox from "../components/NewChatBox.vue";
 export default {
-  data() {
-    return {
-      counter: 0,
-      activeButtonID: null,
-      profilePics: [],
-    };
-  },
-  computed: {
-    listOfUsers() {
-      const currentUsers = this.$store.getters.getCurrentUsers;
-      const loggedInUserID = this.$store.getters.getUserId;
-      const usersWithoutLoggedInUser = currentUsers.filter(
-        (user) => user.userId !== loggedInUserID
-      );
-      return usersWithoutLoggedInUser;
-    },
-    loggedInUser() {
-      const loggedInUserID = this.$store.getters.getUserId;
-      const currentUsers = this.$store.getters.getCurrentUsers;
-      const activeUser = currentUsers.filter(
-        (user) => user.userId === loggedInUserID
-      )[0];
-      // return activeUser.username;
-      if (activeUser) {
-        return activeUser.username;
-      } else {
-        return "loading..."; // or some other default value
-      }
-    },
-    activeButton() {
-      return (userId) => {
-        if (userId === this.activeButtonID) {
-          return "active";
-        }
-      };
-    },
-  },
-
-  methods: {
-    setActiveButton(userId) {
-      this.activeButtonID = userId;
-    },
-    profile(index) {
-        return `https://bootdey.com/img/Content/avatar/avatar${index+1}.png`;
-        // return `https://bootdey.com/img/Content/avatar/avatar1.png`;
-    },
-    setReceiverId(receiverId) {
-      // set the receiver id on click of chat on sidebar
-      this.activeButtonID = receiverId;
-      console.log("activeButtonId: " + this.activeButtonID);
-      console.log("receiverId" + receiverId);
-      this.$store.dispatch("setReceiverIdAction", receiverId);
-    },
-    searchFunction() {
-      // TODO: use v-model to bind the input box and make the searchbar search instantaeneausly
-    },
-    signOut() {
-      this.$store.dispatch("logout");
-      this.$router.replace("/login");
-    },
-
-    // async getProfilePic() {
-    //   const keyword = "nature";
-    //   const apiKey = "4YvuMDn8NnQ0n73D0jPOGVfeoHnCHwO5iOFUyTyU45nfyt3MIjEHOiNo";
-    //   const url = `https://api.pexels.com/v1/search?query=${keyword}&per_page=10&page=1`;
-    //   await fetch(url, {
-    //     headers: {
-    //       Authorization: apiKey,
-    //     },
-    //   })
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //       console.log("data.photos: " + data.photos.length);
-    //       this.profilePics = data.photos;
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //     });
-    // },
-  },
+  components: { SideBar, NewChatHeader, NewChatBox },
+  // TODO: this file is the new ChatPage.vue
 };
 </script>
 
@@ -154,32 +67,6 @@ body {
   -webkit-transition: 0.5s;
   transition: 0.5s;
 }
-
-/** new styling for button */
-/* .people-list .chat-list button {
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-.people-list .chat-list button:hover {
-  background: #efefef;
-  cursor: pointer;
-}
-
-.people-list .chat-list button:focus {
-  outline: none;
-}
-
-.people-list .chat-list button.active {
-  background: #efefef;
-}
-
-.people-list .chat-list button .name {
-  font-size: 15px;
-} */
-/** */
 
 .people-list .chat-list li {
   padding: 10px 15px;
@@ -332,10 +219,6 @@ body {
   font-size: 8px;
   vertical-align: middle;
 }
-
-
-
-
 
 @media only screen and (max-width: 767px) {
   .chat-app .people-list {

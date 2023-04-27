@@ -1,6 +1,6 @@
 <template>
   <div class="outer">
-    <div class="message" :style="{ justifyContent: messageType === 'received' ? 'flex-end' : 'felx-start' }" >
+    <div class="message" :style="{ justifyContent: messageType === 'received' ? 'flex-end' : 'flex-start' }" >
       <p class="message-text" v-bind:class="messageType"><slot></slot></p>
     </div>
   </div>
