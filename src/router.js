@@ -4,14 +4,13 @@ import store from './store/index.js';
 import LoginScreen from './pages/LoginScreen.vue';
 import ChatPage from './pages/ChatPage.vue';
 import NotFound from './pages/NotFound.vue';
-import TestLayoutApp from './pages/TestLayoutApp.vue';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', redirect: '/login' },
     { path: '/login', component: LoginScreen },
-    { path: '/test', component: TestLayoutApp },
+    { path: '/test', component: ChatPage },
     {
       path: '/chat',
       component: ChatPage,

@@ -2,20 +2,26 @@
   <div>
     <!-- original messageBox -->
     <div v-if="error">Something went wrong:{{ error }}</div>
-    <div v-else class="messageBox"  id="list-div">
+    <div v-else class="messageBox" id="list-div">
       <div class="chat-history">
         <ul class="mb-0">
-          <!-- TODO: change testMessages back to currentMessages -->
-          <li
-            class="clearfix"
-            v-for="msg in testMessages"
-            :key="msg.id">
-            <div class="message-data"
-            :class="msg.type === 'sent' ? 'text-end' : ''">
-              <span class="message-data-time">10:10 AM, Today</span>
+          <li class="clearfix" v-for="msg in currentMessages" :key="msg.id">
+            <div
+              class="message-data"
+              :class="msg.type === 'sent' ? 'text-end' : ''"
+            >
+              <span class="message-data-time"
+                >{{ msg.id }}</span
+              >
             </div>
-            <div class="message"
-            :class="msg.type === 'received' ? 'other-message' : 'my-message float-end'">
+            <div
+              class="message"
+              :class="
+                msg.type === 'received'
+                  ? 'other-message'
+                  : 'my-message float-end'
+              "
+            >
               {{ msg.content }}
             </div>
           </li>
@@ -26,7 +32,6 @@
     <div class="outer">
       <!-- this is the message input form-->
       <div class="chat-history inputBox">
-        <!--original message-form -->
         <form id="message-form" @submit.prevent>
           <input
             type="text"
@@ -50,75 +55,31 @@ export default {
       message: "",
       error: null,
       intervalId: null,
-      testMessages: [
-        {
-          id: 1,
-          user: "Alice",
-          content: "ok",
-          type: 'sent'
-        },
-        {
-          id: 2,
-          user: "Bob",
-          content: "Hey Alice, I'm doing pretty well. How about you?",
-          type: 'received'
-        },
-        {
-          id: 3,
-          user: "Alice",
-          content: "I'm doing great, thanks for asking!",
-          type: 'sent'
-        },
-        {
-          id: 4,
-          user: "Bob",
-          content: "That's good to hear. So, what brings you here today?",
-          type: 'received'
-        },
-        {
-          id: 5,
-          user: "Alice",
-          content: "I just wanted to catch up and see how you're doing. It's been a while since we talked!",
-          type: 'received'
-        },
-        {
-          id: 6,
-          user: "Alice",
-          content: "I just wanted to catch up and see how you're doing.\n It's been a while since we talked! I just wanted to catch up and see how you're doing.\n It's been a while since we talked!",
-          type: 'sent'
-        },
-      ]
     };
   },
   computed: {
     currentMessages() {
-      // TODO: activate this and delete the testmethod: testMessages
       return this.$store.getters["messagesMod/currentMessages"];
     },
     receiverIdValue() {
       return this.$store.getters.getReceiverId;
     },
+    
   },
   watch: {
-    receiverIdValue(newVal) {
-      if (newVal !== null) {
+    receiverIdValue(newVal, oldVal) {
+      if (newVal !== null || newVal !== oldVal) {
         this.loadMessagesWhenReceiverIdNotNull();
+        // this.scrollToBottom();
       }
     },
   },
   mounted() {
     this.scrollToBottom();
-  },  
+  },
   beforeUnmount() {
     clearInterval(this.intervalId); // clear the interval when the component is destroyed
   },
-  // mounted() {
-  //   if (this.$store.getters.getReceiverId === null) {
-  //     console.log("\n\n\n\n receiver id is thill null \n\n\n\n");
-  //   } else { // if receiverId is not null call loadeMessages almost constantly
-  //     this.intervalId = setInterval(this.loadMessages, 1000); // call myMethod every second
-  //   }
-  // },
   methods: {
     loadMessagesWhenReceiverIdNotNull() {
       console.log(
@@ -131,7 +92,7 @@ export default {
     async loadMessages() {
       try {
         await this.$store.dispatch("messagesMod/loadMessages");
-        this.scrollToBottom();
+        // this.scrollToBottom();
       } catch (error) {
         console.log("inside loadMessages");
         this.error = error.message || "Something went wrong.";
@@ -143,7 +104,6 @@ export default {
       // which will commit the mutation to add a message to the store
       const messagePayload = {
         id: new Date().toISOString(),
-        // author: "Make this work with user who is logged in",
         content: this.message.trim(),
         type: "sent",
       };
@@ -154,19 +114,16 @@ export default {
       );
       this.message = "";
       this.loadMessages();
+      this.scrollToBottom();
     },
     scrollToBottom() {
       const el = document.getElementById("list-div");
-      console.log("EL: " + el);
       if (el) {
         el.scrollTop = el.scrollHeight;
       }
     },
-
   },
 };
-
-
 </script>
 
 <style scoped>

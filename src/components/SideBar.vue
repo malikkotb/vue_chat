@@ -3,111 +3,88 @@
     <div id="sidebar" class="people-list">
       <div class="input-group mb-3">
         <span class="input-group-text"><i class="fa fa-search"></i></span>
-        <input type="text" class="form-control" placeholder="Search..." />
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search..."
+          v-model="searchQuery"
+          ref="searchInput"
+          @focus="checkSearchActive"
+          @blur="checkSearchActive"
+        />
       </div>
-      <!-- dummy list elements-->
+      <!-- actual list elements-->
       <ul class="list-unstyled chat-list mt-2 mb-0">
-        <li class="clearfix">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar2.png"
-            alt="avatar"
-          />
+        <a
+          role="button"
+          @click="setReceiverId(user.userId)"
+          v-for="(user, index) in filteredUsers"
+          :key="user.userId"
+          ><li class="clearfix" :class="activeButton(user.userId)">
+            <!-- <img :src="pic" alt="avatar" /> -->
+            <img
+              v-if="user.userId !== '404'"
+              :src="profile(index)"
+              alt="avatar"
+            />
+            <div class="about">
+              <div class="name">{{ user.username }}</div>
+              <div class="status" v-if="user.userId !== '404'">
+                <i class="fa fa-circle online"></i> online
+              </div>
+            </div>
+          </li>
+        </a>
+      </ul>
+
+      <ul class="list-unstyled chat-list mt-2 mb-0">
+        <li class="clearfix no-hover">
+          <img src="https://github.com/mdo.png" alt="" />
           <div class="about">
-            <div class="name">Aiden Chavez</div>
-            <div class="status"><i class="fa fa-circle online"></i> online</div>
-          </div>
-        </li>
-        <li class="clearfix">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar2.png"
-            alt="avatar"
-          />
-          <div class="about">
-            <div class="name">Aiden Chavez</div>
-            <div class="status"><i class="fa fa-circle online"></i> online</div>
-          </div>
-        </li>
-        <li class="clearfix">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar2.png"
-            alt="avatar"
-          />
-          <div class="about">
-            <div class="name">Aiden Chavez</div>
-            <div class="status"><i class="fa fa-circle online"></i> online</div>
-          </div>
-        </li>
-        <li class="clearfix active">
-          <img
-            src="https://bootdey.com/img/Content/avatar/avatar2.png"
-            alt="avatar"
-          />
-          <div class="about">
-            <div class="name">Aiden Chavez</div>
-            <div class="status"><i class="fa fa-circle online"></i> online</div>
+            <div class="name">
+              <strong>{{ loggedInUser }}</strong>
+            </div>
+            <div class="status">
+              <button class="signOutBtn" @click="buttonEvent">press me</button>
+            </div>
+            <div></div>
           </div>
         </li>
       </ul>
-      <!-- dummy list elements-->
 
-      <!-- TODO: remove the dummy elements -->
-
-
-      <!-- actual list elements-->
-      <ul class="list-unstyled chat-list mt-2 mb-0">
+      <!-- <div class="footer">
+        <div class="dropdown ml-auto justify-content-end">
           <a
-            role="button"
-            @click="setReceiverId(user.userId)"
-            v-for="(user, index) in listOfUsers"
-            :key="user.userId"
-            ><li class="clearfix" :class="activeButton(user.userId)">
-              <!-- <img :src="pic" alt="avatar" /> -->
-              <img :src="profile(index)" alt="avatar" />
-              <div class="about">
-                <div class="name">{{ user.username }}</div>
-                <div class="status">
-                  <i class="fa fa-circle online"></i> online
-                </div>
-              </div>
-            </li>
-          </a>
-        </ul>
-        <!-- actual list elements-->
-
-    </div>
-
-    <!-- TODO: remove; old SideBarPretty Code -->
-
-    <!-- <div class="chat-app">
-      <div id="plist" class="people-list">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">
-              <i class="fa fa-search"></i>
-            </span>
-          </div>
-          <input type="text" class="form-control" placeholder="Search..." />
-        </div>
-        <ul class="list-unstyled chat-list mt-2 mb-0">
-          <a
-            role="button"
-            @click="setReceiverId(user.userId)"
-            v-for="(user, index) in listOfUsers"
-            :key="user.userId"
-            ><li class="clearfix" :class="activeButton(user.userId)">
-              <img :src="profile(index)" alt="avatar" />
-              <div class="about">
-                <div class="name">{{ user.username }}</div>
-                <div class="status">
-                  <i class="fa fa-circle online"></i> online
-                </div>
-              </div>
-            </li></a
+            href="#"
+            class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle"
+            id="dropdownUser2"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
           >
-        </ul>
-      </div>
-    </div> -->
-
+            <img
+              src="https://github.com/mdo.png"
+              alt=""
+              width="40"
+              height="40"
+              class="rounded-circle me-2"
+            />
+            <strong>{{ loggedInUser }}</strong>
+          </a>
+          <ul
+            class="dropdown-menu text-small shadow"
+            aria-labelledby="dropdownUser2"
+          >
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li @click="signOut">
+              <a class="dropdown-item" href="#">Sign out</a>
+            </li>
+          </ul>
+        </div>
+      </div> -->
+    </div>
   </div>
 </template>
 
@@ -118,9 +95,32 @@ export default {
       counter: 0,
       activeButtonID: null,
       profilePics: [],
+      searchQuery: "",
     };
   },
   computed: {
+    filteredUsers() {
+      const currentUsers = this.listOfUsers;
+      if (!this.searchQuery) {
+        return currentUsers;
+      } else {
+        console.log("searching...");
+        const query = this.searchQuery.toLowerCase();
+        const queriedList = currentUsers.filter((user) =>
+          user.username.toLowerCase().includes(query)
+        );
+        if (queriedList.length === 0) {
+          const noUser = [
+            {
+              username: `Sorry, no results for '${query}'`,
+              userId: "404",
+            },
+          ];
+          return noUser;
+        }
+        return queriedList;
+      }
+    },
     listOfUsers() {
       const currentUsers = this.$store.getters.getCurrentUsers;
       const loggedInUserID = this.$store.getters.getUserId;
@@ -152,12 +152,22 @@ export default {
   },
 
   methods: {
+    buttonEvent() {
+      console.log("BUTTON CLICKED");
+    },
+    checkSearchActive() {
+      if (this.$refs.searchInput === document.activeElement) {
+        console.log("Input focussed");
+      } else {
+        console.log("not focused right now");
+        this.searchQuery = "";
+      }
+    },
     setActiveButton(userId) {
       this.activeButtonID = userId;
     },
     profile(index) {
       return `https://bootdey.com/img/Content/avatar/avatar${index + 1}.png`;
-      // return `https://bootdey.com/img/Content/avatar/avatar1.png`;
     },
     setReceiverId(receiverId) {
       // set the receiver id on click of chat on sidebar
@@ -173,7 +183,6 @@ export default {
       this.$store.dispatch("logout");
       this.$router.replace("/login");
     },
-
     // async getProfilePic() {
     //   const keyword = "nature";
     //   const apiKey = "4YvuMDn8NnQ0n73D0jPOGVfeoHnCHwO5iOFUyTyU45nfyt3MIjEHOiNo";
@@ -200,6 +209,12 @@ export default {
 body {
   background-color: #f4f7f6;
   margin-top: 20px;
+}
+.footer {
+  position: relative;
+  bottom: 0;
+  margin-top: 250px;
+  margin-left: 25px;
 }
 .card {
   background: #fff;
@@ -232,32 +247,6 @@ body {
   transition: 0.5s;
 }
 
-/** new styling for button */
-/* .people-list .chat-list button {
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-.people-list .chat-list button:hover {
-  background: #efefef;
-  cursor: pointer;
-}
-
-.people-list .chat-list button:focus {
-  outline: none;
-}
-
-.people-list .chat-list button.active {
-  background: #efefef;
-}
-
-.people-list .chat-list button .name {
-  font-size: 15px;
-} */
-/** */
-
 .people-list .chat-list li {
   padding: 10px 15px;
   list-style: none;
@@ -267,6 +256,21 @@ body {
 .people-list .chat-list li:hover {
   background: #efefef;
   cursor: pointer;
+}
+
+button.signOutBtn {
+  border: none;
+  background-color: transparent;
+  color: red;
+  text-decoration: none;
+  padding: 0;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+li.no-hover {
+  pointer-events: none;
+  background-color: green;
 }
 
 .people-list .chat-list li.active {

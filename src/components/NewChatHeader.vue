@@ -12,38 +12,6 @@
           <small>Last seen: 2 hours ago</small>
         </div>
       
-        <!-- loggedInUser Profile -->
-        <!-- <div class="dropdown ml-auto justify-content-end">
-          <a
-            href="#"
-            class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle"
-            id="dropdownUser2"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <img
-              src="https://github.com/mdo.png"
-              alt=""
-              width="32"
-              height="32"
-              class="rounded-circle me-2"
-            />
-            <strong>{{ loggedInUser }}</strong>
-          </a>
-          <ul
-            class="dropdown-menu text-small shadow"
-            aria-labelledby="dropdownUser2"
-          >
-            <li><a class="dropdown-item" href="#">New project...</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><hr class="dropdown-divider" /></li>
-            <li @click="signOut">
-              <a class="dropdown-item" href="#">Sign out</a>
-            </li>
-          </ul>
-        </div> -->
-      
       </div> 
     </div>
   </div>
@@ -76,7 +44,7 @@ export default {
     },
     receiverName() {
       const receiverId = this.$store.getters.getReceiverId;
-      console.log(receiverId);
+      // console.log(receiverId);
       const currentUsers = this.$store.getters.getCurrentUsers;
       const currentReceiver = currentUsers.filter(
         (user) => user.userId === receiverId

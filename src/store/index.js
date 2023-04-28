@@ -154,8 +154,6 @@ const store = createStore({
 
       console.log("userList inside action: ", userList);
       context.commit("setUserList", userList);
-      // TODO: use this data to display the list of users to access individual chats
-      // between 2 users
     },
     logout(context) {
       context.commit("logout");

@@ -37,7 +37,10 @@ export default {
         if (snapshot.exists()) {
           const responseData = snapshot.val();
           for (const key in responseData) {
-            if (responseData[key].receiver_id === receiverId || responseData[key].sender_id === receiverId) {
+            if (
+              responseData[key].receiver_id === receiverId ||
+              responseData[key].sender_id === receiverId
+            ) {
               const message = {
                 id: responseData[key].message_id,
                 content: responseData[key].content,
@@ -116,11 +119,9 @@ export default {
         id: userId,
       });
 
-      // call loadMessages 
+      // call loadMessages
       //now calling loadmessages as soon as there is a new message
       context.dispatch("loadMessages");
-
-
     },
   },
 
