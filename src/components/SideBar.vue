@@ -37,7 +37,8 @@
         </a>
       </ul>
 
-      <ul class="list-unstyled chat-list mt-2 mb-0">
+      <!-- footer -->
+      <ul class="list-unstyled chat-list profileUl" id="footerProfile">
         <li class="clearfix no-hover">
           <img src="https://github.com/mdo.png" alt="" />
           <div class="about">
@@ -45,7 +46,7 @@
               <strong>{{ loggedInUser }}</strong>
             </div>
             <div class="status">
-              <button class="signOutBtn" @click="buttonEvent">press me</button>
+              <button class="signOutBtn" @click="signOut">Sign Out</button>
             </div>
             <div></div>
           </div>
@@ -176,9 +177,6 @@ export default {
       console.log("receiverId" + receiverId);
       this.$store.dispatch("setReceiverIdAction", receiverId);
     },
-    searchFunction() {
-      // TODO: use v-model to bind the input box and make the searchbar search instantaeneausly
-    },
     signOut() {
       this.$store.dispatch("logout");
       this.$router.replace("/login");
@@ -210,12 +208,12 @@ body {
   background-color: #f4f7f6;
   margin-top: 20px;
 }
-.footer {
+/* .footer {
   position: relative;
   bottom: 0;
   margin-top: 250px;
   margin-left: 25px;
-}
+} */
 .card {
   background: #fff;
   transition: 0.5s;
@@ -231,6 +229,7 @@ body {
   position: absolute;
   left: 0;
   top: 0;
+  height: 100%;
   padding: 20px;
   z-index: 7;
 }
@@ -258,19 +257,36 @@ body {
   cursor: pointer;
 }
 
+.profileUl {
+  position: absolute;
+  bottom: 2%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+#footerProfile li:hover {
+  background-color: white !important;
+}
+
 button.signOutBtn {
   border: none;
   background-color: transparent;
-  color: red;
+  color: black;
   text-decoration: none;
   padding: 0;
   font-size: inherit;
   cursor: pointer;
+  pointer-events: all;
+}
+
+button.signOutBtn:hover {
+  opacity: 80%;
+  color: #999;
 }
 
 li.no-hover {
   pointer-events: none;
-  background-color: green;
 }
 
 .people-list .chat-list li.active {

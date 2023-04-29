@@ -10,9 +10,7 @@
               class="message-data"
               :class="msg.type === 'sent' ? 'text-end' : ''"
             >
-              <span class="message-data-time"
-                >{{ msg.id }}</span
-              >
+              <span class="message-data-time">{{ prettyDate(msg.id) }}</span>
             </div>
             <div
               class="message"
@@ -64,7 +62,6 @@ export default {
     receiverIdValue() {
       return this.$store.getters.getReceiverId;
     },
-    
   },
   watch: {
     receiverIdValue(newVal, oldVal) {
@@ -120,6 +117,38 @@ export default {
       const el = document.getElementById("list-div");
       if (el) {
         el.scrollTop = el.scrollHeight;
+      }
+    },
+    prettyDate(dateTimeStr) {
+      if (!dateTimeStr.includes("|")) {
+        // Handle the error
+        return "Invalid date format";
+      }
+
+      const [date, time] = dateTimeStr.split("|");
+      const [day, month, year] = date.split("-");
+      const [hour, minute] = time.split(":");
+      const shortYear = year.slice(-2);
+
+      const dateNormal = `${day}.${month}.${shortYear}`;
+      const formattedDate = this.formatDate(`${dateNormal}`);
+      return `${hour}:${minute}, ${formattedDate}`;
+    },
+    formatDate(dateStr) {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const date = new Date(
+        dateStr.replace(/(\d{1,2}).(\d{1,2}).(\d{2})/, "20$3-$2-$1")
+      );
+
+      if (date.toDateString() === today.toDateString()) {
+        return "Today";
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return "Yesterday";
+      } else {
+        return dateStr;
       }
     },
   },
